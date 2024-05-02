@@ -1,1 +1,190 @@
 
+Github Repositories used in this Course
+
+
+
+Azure AKS Kubernetes - Masterclass | Azure DevOps, Terraform: https://github.com/stacksimplify/azure-aks-kubernetes-masterclass
+
+Azure DevOps for Kubernetes Workloads running on Azure AKS Cluster: https://github.com/stacksimplify/azure-devops-github-acr-aks-app1
+
+Provision Azure AKS Cluster using Terraform and Azure DevOps: https://github.com/stacksimplify/azure-devops-aks-kubernetes-terraform-pipeline
+
+Docker Fundamentals: https://github.com/stacksimplify/docker-fundamentals
+
+Presentation with 250 Slides outlining the various architectures and designs we are going to do in this course: https://github.com/stacksimplify/azure-aks-kubernetes-masterclass/tree/master/ppt-presentation
+
+Important Note: Please go to these repositories and FORK these repositories and make use of them during the course.
+
+Thank you !!!!!
+
+***********************************************
+Create AKS Cluster
+network config:- Azure CNI feature recommended(eas to integrate with azure services)
+login to K8s cluser using azure cli or azure shell
+follow
+
+https://github.com/stacksimplify/azure-aks-kubernetes-masterclass/tree/master/01-Create-AKS-Cluster
+# List Namespaces
+kubectl get namespaces
+kubectl get ns
+
+# List Pods from all namespaces
+kubectl get pods --all-namespaces
+
+# List all k8s objects from Cluster Control plane
+kubectl get all --all-namespaces
+
+Step-07: Deploy Sample Application and Test
+# Deploy Application
+
+Deploymrnt.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp1-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: myapp1
+  template: 
+    metadata: # Dictionary
+      name: myapp1-pod
+      labels: # Dictionary 
+        app: myapp1       
+    spec:
+      containers: # List
+        - name: myapp1-container
+          image: stacksimplify/kubenginx:1.0.0
+          ports:
+            - containerPort: 80
+
+
+
+load balancer.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp1-loadbalancer
+  labels: 
+    app: myapp1
+spec:
+  type: LoadBalancer 
+  selector:
+    app: myapp1
+  ports: 
+    - port: 80
+      targetPort: 80
+
+kubectl apply -f kube-manifests/
+
+# Verify Pods
+kubectl get pods
+
+# Verify Deployment
+kubectl get deployment
+
+# Verify Service (Make a note of external ip)
+kubectl get service
+
+# Access Application
+http://<External-IP-from-get-service-output>
+
+General*********************************8
+Build Docker Image & run it
+docker build -t stacksimplify/mynginx_image1:v1 .
+docker run --name mynginx1 -p 80:80 -d stacksimplify/mynginx_image1:v1
+
+Replace your docker hub account Id
+docker build -t <your-docker-hub-id>/mynginx_image1:v1 .
+docker run --name mynginx1 -p 80:80 -d <your-docker-hub-id>/mynginx_image1:v1
+
+ag & push the Docker image to docker hub
+docker images
+docker tag stacksimplify/mynginx_image1:v1 stacksimplify/mynginx_image1:v1-release
+docker push stacksimplify/mynginx_image1:v1-release
+
+Replace your docker hub account Id
+docker tag <your-docker-hub-id>/mynginx_image1:v1 <your-docker-hub-id>/mynginx_image1:v1-release
+docker push <your-docker-hub-id>/mynginx_image1:v1-release
+
+*************************************
+Gen:-We cannot have multiple cons of same kind in a single POD.
+eg:- 2 nginx containers in singlr pOD servincg the same purpose is not recommended.
+
+We can have multiple cons in a single POD,provided they are not of same kind.
+like sidecars helper containers for main con,push data by collecting logs from main con for example
+
+Gen:- Kubectl scale --replicas in a deployment (manual way) u can do it using HPA
+
+Gen:- Rollback to prev version of deployment
+kubectl rollout history deployment/deploy-name --revision=
+
+Pause & Resume Deployments
+Step-00: Introduction
+Why do we need Pausing & Resuming Deployments?
+If we want to make multiple changes to our Deployment, we can pause the deployment make all changes and resume it.
+We are going to update our Application Version from V3 to V4 as part of learning "Pause and Resume Deployments"
+Step-01: Pausing & Resuming Deployments
+Check current State of Deployment & Application
+# Check the Rollout History of a Deployment
+kubectl rollout history deployment/my-first-deployment  
+Observation: Make a note of last version number
+
+# Get list of ReplicaSets
+kubectl get rs
+Observation: Make a note of number of replicaSets present.
+
+# Access the Application 
+http://<External-IP-from-get-service-output>
+Observation: Make a note of application version
+Pause Deployment and Two Changes
+# Pause the Deployment
+kubectl rollout pause deployment/<Deployment-Name>
+kubectl rollout pause deployment/my-first-deployment
+
+# Update Deployment - Application Version from V3 to V4
+kubectl set image deployment/my-first-deployment kubenginx=stacksimplify/kubenginx:4.0.0 --record=true
+
+# Check the Rollout History of a Deployment
+kubectl rollout history deployment/my-first-deployment  
+Observation: No new rollout should start, we should see same number of versions as we check earlier with last version number matches which we have noted earlier.
+
+# Get list of ReplicaSets
+kubectl get rs
+Observation: No new replicaSet created. We should have same number of replicaSets as earlier when we took note. 
+
+# Make one more change: set limits to our container
+kubectl set resources deployment/my-first-deployment -c=kubenginx --limits=cpu=20m,memory=30Mi
+Resume Deployment
+# Resume the Deployment
+kubectl rollout resume deployment/my-first-deployment
+
+# Check the Rollout History of a Deployment
+kubectl rollout history deployment/my-first-deployment  
+Observation: You should see a new version got created
+
+# Get list of ReplicaSets
+kubectl get rs
+Observation: You should see new ReplicaSet.
+
+# Get Load Balancer IP
+kubectl get svc
+Access Application
+# Access the Application 
+http://<External-IP-from-get-service-output>
+Observation: You should see Application V4 version
+Step-02: Clean-Up
+# Delete Deployment
+kubectl delete deployment my-first-deployment
+
+# Delete Service
+kubectl delete svc my-first-deployment-service
+
+# Get all Objects from Kubernetes default namespace
+kubectl get all
+azure-aks-kubernetes-masterclass/03-Kubernetes-Fundamentals-with-kubectl/03-03-Deployments-with-kubectl/03-03-04-Pause-and-Resume-Deployment at master · stacksimplify/azure-aks-kubernetes-masterclass
+
+
+
+
