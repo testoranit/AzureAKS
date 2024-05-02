@@ -186,5 +186,50 @@ kubectl get all
 azure-aks-kubernetes-masterclass/03-Kubernetes-Fundamentals-with-kubectl/03-03-Deployments-with-kubectl/03-03-04-Pause-and-Resume-Deployment at master · stacksimplify/azure-aks-kubernetes-masterclass
 
 
+**************
+Azure disks(same like ebs in aws)
+cost effective and scaling,built in security
+**Create storage class Kubernetes manifest PVC.
+https://github.com/stacksimplify/azure-aks-kubernetes-masterclass/tree/master/05-Azure-Disks-for-AKS-Storage/05-01-SC-PVC-ConfigMap-MySQL
 
+
+
+COnfigmaps:-
+store values in key value pair format
+
+
+****************
+connectect micro services apps to Azure sql db.
+************
+K8s Secrests:-
+# Mac
+echo -n 'dbpassword11' | base64
+
+# URL: https://www.base64encode.org
+https://github.com/stacksimplify/azure-aks-kubernetes-masterclass/blob/master/07-Kubernetes-Secrets/README.md
+
+
+***************
+Azure files:- like EFS in AWS.
+https://github.com/stacksimplify/azure-aks-kubernetes-masterclass/blob/master/09-Ingress-Basic/README.md
+
+
+
+**************************
+Ingress :_ SSL ENryption
+https://github.com/stacksimplify/azure-aks-kubernetes-masterclass/tree/master/14-Ingress-SSL-with-LetsEncrypt
+
+
+******************************
+K8s: Resource & Limits(do it using requests and limits), requets is the requested utlization and limit is the max utlization.
+how much container in a pod could use cpu and memory
+
+
+************ACR and AKS
+create and ACR and attach it to aks
+or
+u can have multiple ACR's  and u can generate service pricncipal and using sp u can create a secreat and using secret u can connect to ACR.
+ACR Pricing tiers(Basic and standard=public registry and premium=private)
+
+![Azure devops](https://github.com/testoranit/AzureAKS/assets/124513439/be91217b-2769-4968-affb-758f94247b73)
 
