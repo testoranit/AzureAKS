@@ -232,3 +232,17 @@ u can have multiple ACR's  and u can generate service pricncipal and using sp u 
 ACR Pricing tiers(Basic and standard=public registry and premium=private)
 
 ![Azure devops](https://github.com/testoranit/AzureAKS/assets/124513439/ec3a24f4-894a-4628-9375-526f75f4cea2)
+
+in build pipeline section u can also create deployment pipeline
+or
+u can also do like once build pipeline is complete create release pipeline to do deploy accross environments.
+
+lab:-
+local code-->push to git hub-->create ACR on Azure-->create org in dev.azure-->project.
+create folder
+create pipeline with proper name
+and do integration of git aand ACR and build the piepline using predined temp
+this wll build image and store it in ACR
+now do git pull every time  want do changes on remote git
+do local git pull so that u are not left behind the remote commits
+git pull on local-->do changes-->piepleline will trigger and build an image.
