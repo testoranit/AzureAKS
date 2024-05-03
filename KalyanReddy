@@ -246,3 +246,713 @@ this wll build image and store it in ACR
 now do git pull every time  want do changes on remote git
 do local git pull so that u are not left behind the remote commits
 git pull on local-->do changes-->piepleline will trigger and build an image.
+
+Gen in build pipleline u can have build and deploy stage .
+LAB:- Now build image and pus to ACR and then deploy to AKS
+use same steps just use predefined piline deploy to AKS from AZure.
+
+*************
+option 2 :- using starter pipelines
+herirachy ( a pipeline has stages under stage jobs and under job steps)
+lab:- pull code from gitthub and build image and push to acr
+u can use build in azure pipleines and then customize it or u can build fully customized pipeline
+when u do the semi customized way
+u can add tasksa
+like the code has to be copied from system directory to artifact dir
+once done it as to publish artifacts(creates temp container and copies content here) to azure pipleines so that azure release pipeline can do the deployment..
+***********this is important
+
+**
+Lab:- starter piplrine
+1)create service connection so that pipleine can push image to ACR.
+2)create pipeline-->starter pipeline
+
+
+*************
+Azure Relese pipelines(to acheive Cont Delivery)
+CI Build-->Dev-->QA-->Pre-prod-->Prod
+all stage will need approval.
+
+gen:- u can also create sep namespaces fo each env n 1 aks cluster.
+
+create service connection for namespaces./
+add artifacts & enable cd trigger
+got to release new pipeline dev stage
+add task
+create secret to pull image from acr
+Add task deploy to K8s
+
+
+
+
+
+********************************
+CLuster Auto scaler:- scale out nodes
+HPA:_ scale out/scaled pods
+
+LAB:- Cluster Auto scaling
+increase the number of pods in the deployment(replicas=20)
+
+
+Lab:- HPA
+default K8S concept.
+it needs K8s metrics server to verify CPU metrics
+(min replicas and max replicas)
+kubectl autoscale deployment deployment name --cpu-percent=50 --min=1 --max=10
+In Azure AKS _- metrics is automatically enabled but not in AWS EKS
+also Azure control pnae is free but AWS does charge for it's control plane.
+generate soe load
+
+kubectl get hpa
+![AKS Prod cluster](https://github.com/testoranit/AzureAKS/assets/124513439/f41c1184-5689-4bdd-842b-90c0aa8718b4)
+
+Tanscript of above diagraM:-
+-: Welcome back.
+
+In this section, we are going to design
+
+a production grade AKS cluster using Azure AKS CLI.
+
+So, most of the times it is not recommended to
+
+use the Azure portal management console.
+
+For that purpose,
+
+we should be also familiar with Azure AKS CLI.
+
+So, in this respective series of three sections
+
+so we are going to understand about how we are
+
+going to create AKS cluster using AKS CLI.
+
+And, in addition to that, we are also going to explore more
+
+about this AKS cluster from node pools perspective
+
+what are system node pools, what are user note pools
+
+and how we can create user node pools
+
+of OS type Linux, of OS type Windows,
+
+and also virtual nodes.
+
+And, finally, we are also going to deploy the applications
+
+based on Kubernetes concept called node selectors.
+
+So, using that concept,
+
+we are going to deploy applications which are
+
+Java applications to Linux user node pools
+
+and windows dot net applications to Windows node pools
+
+and also few simple web server applications
+
+to virtual nodes.
+
+In addition to that, if you want to schedule our apps
+
+to even the system node pool worker nodes
+
+even we are going to do that.
+
+So, all these things we are going to do
+
+in this respective section, right?
+
+So, let's move on and understand about what
+
+how the cluster is going to look like.
+
+So, if you see Azure AKS cluster
+
+so the core thing inside that is
+
+like these are the core things
+
+and then these will be subdivided into multiple things.
+
+So, let's understand like basics, integrations, node pools,
+
+authentication and then networking.
+
+So, these are the core items
+
+and each item will have its own sub-concepts, okay?
+
+So, if you stick basics in basics
+
+the primary thing which you decide is in which region
+
+I want to create the AKS cluster.
+
+In the same way, you'll also discuss or understand about
+
+which version of Kubernetes you want to use
+
+as part of your Azure AKS cluster.
+
+And, finally, your Azure AKS cluster system node pools
+
+should be in how many zones.
+
+So, Azure provides default to three zones
+
+and for you to have high availability,
+
+you want to put it on one or two or three zones.
+
+So, that's our decision.
+
+So, these are the decision making points you need to make
+
+from basic standpoint.
+
+And, next thing is node pools.
+
+So, by default, whenever you create a Azure AKS cluster
+
+so it'll create a system node pool,
+
+which is nothing but node pool
+
+with one or two or three worker nodes
+
+which is called system node pool.
+
+So, if you see here, Azure AKS cluster is free
+
+or it's control plane is free,
+
+that's what Azure advertises as, okay?
+
+But when you compare with AWS EKS clusters,
+
+AWS EKS cluster per day,
+
+it'll cost close to dollar 2.5 for its control plane.
+
+But here, Azure AKS cluster control plane is free.
+
+That's what Azure advertises.
+
+But, underlying what is happening here is
+
+it is going to create a system node pool
+
+and cluster control plane related components.
+
+Minimum components will also will be running
+
+on our system node pool.
+
+So, which means whole automation concept,
+
+whatever Azure has done is free for us.
+
+But, still you are paying for the system node pool here.
+
+Okay?
+
+So, one or two worker nodes, whatever you
+
+want your cluster control plane to be running.
+
+So, that is in your cost only.
+
+So, which we really don't understand if we go inside
+
+and then deep, then only we can understand these concepts
+
+when comparing with other cloud provider.
+
+So, with that said,
+
+so here you'll have the system node pools
+
+for running your Azure AKS cluster system-related workloads,
+
+which is nothing but Kube system,
+
+whatever the workloads inside that,
+
+it'll be running like ACS connector or Kube DNS
+
+or code DNS or whatever.
+
+All those things will be running in the system node pools.
+
+In addition to that,
+
+if you want to also schedule your application workloads
+
+on your system note pool related worker notes,
+
+you can even do so.
+
+Okay, so by default, whatever we are seeing
+
+from beginning of the course till now,
+
+we are deploying directly to system node pools only.
+
+Okay, we really didn't create any new node pools
+
+for application workloads,
+
+but the real design is to ensure that
+
+your system things runs in system node pools
+
+and your application things runs in
+
+your application node pools,
+
+which are called user node pools.
+
+Again, user node pools can be of Linux and then Windows.
+
+So, those we are going to look into.
+
+In addition to that,
+
+you also have something called virtual nodes.
+
+So, which you have already seen in a dedicated section.
+
+So, just mentioning here as a concept that
+
+when node pools are coming in,
+
+so you can run your workloads on system node pools,
+
+user node pools with Windows and Linux,
+
+and also on virtual nodes only Linux
+
+on serverless infrastructure,
+
+which is nothing but Azure container instances in Azure.
+
+So, this completes the basics and the node pool section.
+
+So, the next section is authentication.
+
+So, as we said,
+
+system-assigned managed identity will be the superset
+
+of all other identities in Azure.
+
+And, in long run,
+
+this is going to be the thing will be a standard
+
+for us for anything to use.
+
+So, with that said, all our clusters so far
+
+we have used also is system-assigned managed identity.
+
+And, here also we are going to do the same.
+
+So, that is a decision point you need to make.
+
+I need to use system-assigned managed identity
+
+or service principle.
+
+Okay?
+
+So, recommended to use system-assigned managed identity.
+
+And, next is Kubernetes RBAC.
+
+So, this is a default setting enabled
+
+by default whenever you create a AKS cluster.
+
+You need it or not is your choice
+
+and 99.99% our choice is to enable Kubernetes RBAC
+
+for effective management
+
+of role-based access control for the Kubernetes resources.
+
+Okay?
+
+So, it's always good to enable that.
+
+And, the next thing is AKS manager Azure 80.
+
+So, this is a optional feature and
+
+in our demo we are enabling it
+
+and we already seen the dedicated section
+
+about that in our previous sections.
+
+But, as a best practice when you are going to
+
+have your Kubernetes cluster
+
+as Azure AKS cluster in your cloud provider, which is Azure,
+
+so it is always good to integrate
+
+with act to directory type of things
+
+for your user management section of your cluster admins.
+
+Okay?
+
+So, always it's a recommended thing to use it.
+
+But, one drawback is, drawback or whatever it is.
+
+Once you enable it, you cannot disable it.
+
+So, the decision, again, another decision point here is
+
+whether you want to enable AKS manager Azure 80 or not,
+
+is your choice and ensure that
+
+if you enable it you cannot disable it.
+
+So, that's the reason.
+
+So, that decision need to be taken with the caution.
+
+So, with that said, we are moving onto the next item, right?
+
+So, networking.
+
+So, from networking perspective,
+
+the core thing is Azure CNA.
+
+So, by default it also provides Kubenet networking.
+
+So, which we should not use ever, ever.
+
+We should not use that.
+
+Always use Azure CNA networking
+
+or if you are in Kubernetes in Amazon,
+
+you use your own Kubernetes VPC related off AWS,
+
+in the same way in Azure use Azure CNA networking
+
+because so they will be more powerful in their cloud.
+
+So, always your Kubernetes cluster when using with Azure CNA
+
+it is compatible with virtual nodes
+
+and it's all the same network, right?
+
+So, it is going to be high performing, okay?
+
+So, always ensure that you are using the Azure CNA.
+
+And, next thing is load balancer by default,
+
+the standard load balancer of Azure will be selected.
+
+And, here there will be lot of options
+
+which you need to decide.
+
+So, when you are doing it,
+
+when you're designing your Azure a case cluster.
+
+So, I will explain one or two here,
+
+but you can move on and then explore more about it.
+
+So, this is a very important thing for major outages
+
+in your cluster if
+
+you don't design this load balancer correctly,
+
+primarily from outbound traffic perspective.
+
+So, when your AKS cluster has outbound traffic
+
+from your Azure network to outside,
+
+which means like you want to go from your AKS cluster
+
+to outside and access something else, right?
+
+Either it is an Azure cloud or somewhere else, okay?
+
+So, when you have the internal applications
+
+of Azure AKS cluster planning to access outside resources,
+
+so how much network bandwidth you have provided
+
+on the load balancer standard is the core thing.
+
+So, there comes the S-Net concepts and then outbound IPs.
+
+So, all those concepts comes in there
+
+when we go inside deep of our core of this section.
+
+So, we'll discuss those options separately, okay?
+
+So, but important thing
+
+is design your load balancer standard
+
+with enough outbound IPs for your outbound connections
+
+if you are using it in production grid
+
+and if you have the outbound heavy traffic, okay?
+
+If not, you can leave it the one IP
+
+whatever default it creates, okay?
+
+Why?
+
+Because one IP provides
+
+you 65535 connections outbound, okay?
+
+So, if that is sufficient for you, no need.
+
+So, and the next thing is public cluster or private cluster.
+
+Okay, so this is another important decision point.
+
+Okay, so what is this public private, okay, so simple okay?
+
+If you have access to
+
+your Kubernetes APA server for Azure your commands,
+
+wire public if you need it means like wire public network
+
+then enable your cluster as a public cluster.
+
+So, if you really don't want your Kubernetes APA
+
+server to be exposed on the public network,
+
+so use the private network, only one simple decision there.
+
+So, you want your kubectl commands
+
+to be excluded from the public world,
+
+then use public cluster, if not private cluster.
+
+So, if you use private cluster, then what are my choices?
+
+You create your jump box
+
+and then connect your cluster and then administer it.
+
+And, if you use your public cluster still,
+
+I want my APA server to be secure.
+
+Azure even provides that,
+
+that is nothing but restrict access
+
+for your public cluster APA server
+
+with the specific IPs who needs access to.
+
+The rest all will be denied.
+
+So, either it is a public or a private
+
+you have an option to safeguard your APA server
+
+when you are exposing it in the public world also.
+
+Okay, so with that said networking part is completed.
+
+So, we discussed about basics, node pools,
+
+authentication and networking.
+
+And, finally, we have something called integrations, right?
+
+So, integrations are nothing
+
+but Azure AKS cluster, add-ons you can say.
+
+So, one is like container registry.
+
+So, by default any Kubernetes workload you deploy
+
+if you have your docker image
+
+and docker hub you can bring it and then use it.
+
+But, you are in Azure cloud,
+
+it is your security reasons for your organization
+
+or whatever it is, you are pushed to use
+
+only Azure container registry.
+
+So, if that is the case,
+
+how you are going to use it
+
+we already discussed
+
+and implemented container registry with service principle
+
+and by attaching directly to the Azure AKS cluster.
+
+So, multiple use cases already in Azure container registry.
+
+Okay?
+
+So, that is one option where you want to decide
+
+whether it is Docker Hub
+
+or Azure container registry
+
+or elastic container registry of the AWS
+
+where your things are there based on that you decide.
+
+And, important section with container registries,
+
+so the Azure container registry
+
+what you are going to use, right?
+
+So, it can be easily integrated with service principle
+
+which we have already discussed in that ACR section.
+
+Okay?
+
+So, with that said,
+
+so it's not a big decision point for you to
+
+take when you are creating the Azure AKS cluster,
+
+provided if you have multiple container registries.
+
+Only if you have one container registry
+
+for all your applications,
+
+during the creation of the cluster itself
+
+you can attach that container registry
+
+After creation of the cluster also you can attach
+
+that container registry
+
+so that you really don't need to worry
+
+about this service principle.
+
+And, then authorization authentication stuff.
+
+With that said, that's more about container registry.
+
+So, next comes the Azure Monitor, right?
+
+So, when you create your Kubernetes cluster
+
+using Azure portal,
+
+your Azure monitoring is by default enabled.
+
+But, with AKS cluster it's an add-on which
+
+you need to enable.
+
+So, for affect you monitoring of your cluster.
+
+So, with that said, when you're doing it with CLI
+
+you need to ensure that Azure monitor add on is enabled
+
+as part of your integrations.
+
+So, one more is Azure policy.
+
+So, this one is your choice for additional security
+
+between the port-to-port communication and all those things.
+
+You can define your policies and then do it.
+
+But, this is super, super advance and next level stuff,
+
+okay?
+
+Ideally.
+
+So, if you want to go into that deep end
+
+and then implement for banking sectors
+
+and all those things, you go inside those things.
+
+But, high level that is not a big thing to take a decision
+
+during the creation of the cluster itself.
+
+Later also you can enable it.
+
+So, with that said,
+
+our cluster looks this way with all these options.
+
+Okay, so in our next lecture we are going to
+
+still discuss more about these clusters
+
+and inside this section what we are going to do
+
+before going in then implementing it.
+
+So far, we have practically implemented
+
+with the last theory,
+
+but here it is the time
+
+that we need to understand everything
+
+in detail before going in and implementing.
+
+So, I'll see you in the next lecture.
+
+Until then, bye bye.
+
+Thank you.
+
+
