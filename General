@@ -1,0 +1,43 @@
+Canary environment
+A Canary environment, also known as Canary deployment or Canary release, is a technique used in software development and deployment to test new features or updates with a small subset of users before rolling them out to the entire user base. This approach helps to minimize the risk associated with deploying changes by gradually introducing them to users, allowing for early detection of any issues or bugs before they affect a larger audience.
+
+Canary vS UAT.
+
+Similarities:
+
+Testing New Features: Both Canary deployments and pre-production environments are used to test new features, updates, or changes to software before they are released to the entire user base.
+Risk Mitigation: They help mitigate the risk associated with deploying changes by allowing for testing in a controlled environment before impacting the production environment and all users.
+Gathering Feedback: Both approaches involve gathering feedback from users or testers to identify any issues, bugs, or usability concerns before the changes are rolled out widely.
+Differences:
+
+Scope and Timing:
+Canary Deployment: Canary deployments typically involve deploying changes to a small subset of users or devices in the production environment, often before the changes are fully completed or finalized.
+Pre-Production Environment (UAT): UAT environments are separate environments that mirror the production environment but are used exclusively for testing purposes. Changes are typically tested in the UAT environment before being deployed to production.
+Audience:
+Canary Deployment: Changes deployed in a Canary environment are typically tested by real users or a subset of users in the production environment.
+Pre-Production Environment (UAT): UAT environments are often used by internal testers, quality assurance teams, or stakeholders who validate the changes before they are released to production.
+Purpose:
+Canary Deployment: The primary purpose of Canary deployments is to detect and mitigate any issues or bugs early in the deployment process by gradually rolling out changes to a small subset of users.
+Pre-Production Environment (UAT): UAT environments are used to validate that the changes meet the requirements and expectations of stakeholders, ensuring that they are ready for release to the production environment.
+
+**********************************
+
+Node pools in AKS
+
+
+In Azure Kubernetes Service (AKS), there are different types of node pools and virtual nodes available for managing and scaling the resources in your Kubernetes cluster. Here's a breakdown of the differences between system node pools, user node pools, and virtual nodes in AKS:
+
+1. System Node Pools:
+
+Purpose: System node pools are created by default when you create an AKS cluster. They are primarily used to host system pods and core Kubernetes services, such as kube-proxy, kube-dns, and other system-level components.
+Management: System node pools are managed by AKS and cannot be deleted or scaled manually. They are automatically provisioned and managed by the AKS control plane.
+Configuration: The configuration of system node pools, including node size, count, and OS image, is predefined by AKS and cannot be customized.
+Use Cases: System node pools are not intended for running user workloads or applications. They provide the underlying infrastructure required for the operation of the Kubernetes cluster itself.
+
+2. User Node Pools:
+
+Purpose: User node pools are additional node pools that can be created by AKS users to run their applications and workloads. Unlike system node pools, user node pools are customizable and can be tailored to specific workload requirements.
+Management: User node pools can be created, deleted, scaled, and upgraded manually by AKS users through the Azure portal, CLI, or API. Users have control over the configuration and management of user node pools.
+Configuration: Users can specify the node size, count, OS image, and other configurations when creating a user node pool. This allows users to optimize the resources for their specific workloads.
+Use Cases: User node pools are suitable for running user workloads, applications, and services within the AKS cluster. They provide flexibility and scalability for deploying and managing various types of workloads.
+
