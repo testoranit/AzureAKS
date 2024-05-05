@@ -27,7 +27,7 @@ Node pools in AKS
 
 In Azure Kubernetes Service (AKS), there are different types of node pools and virtual nodes available for managing and scaling the resources in your Kubernetes cluster. Here's a breakdown of the differences between system node pools, user node pools, and virtual nodes in AKS:
 
-1. System Node Pools:
+1. System Node Pools:(only linux)
 
 Purpose: System node pools are created by default when you create an AKS cluster. They are primarily used to host system pods and core Kubernetes services, such as kube-proxy, kube-dns, and other system-level components.
 Management: System node pools are managed by AKS and cannot be deleted or scaled manually. They are automatically provisioned and managed by the AKS control plane.
