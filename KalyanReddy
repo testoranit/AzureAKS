@@ -809,6 +809,8 @@ if you have your docker image
 
 and docker hub you can bring it and then use it.
 
+
+
 But, you are in Azure cloud,
 
 it is your security reasons for your organization
@@ -954,5 +956,81 @@ So, I'll see you in the next lecture.
 Until then, bye bye.
 
 Thank you.
+
+
+***********************************
+99% of the times u need to create ur virtual network and then create ur AKS cluster bu u can also use default virtual nets.
+if u have to create windoes node pool u need to mention user id and password.
+Pord grade cluster:-
+create rg
+create vnet
+create default subnet has node pools
+control plane in vnet 
+create sepaarte subnet for Virtual Nodes(serverless)
+Create azure AD User,group for managing AKS cluster using Azure AD Users.
+create ssh keys keys to enable and access the K8s worker nodes via terminal.
+create LAW for enabling Monitoring add on during AKS cluster creation.
+Set WIndows Username and password during AKS cluster creation to have AKS cluster support future windows Nodepools.
+
+Once cluster is created test aks cluster connection.
+
+if u want to restrict access to API server u can do it by bypassing access to specific ip's only.
+
+*************
+Now create 
+user node pools ( linux pool and windows pool)
+also under virtual nodes subnet create azure container Instances which has virtual node pools.
+
+Note:_ u create ur own custom  virtual network which u created befor the AKS cluster so u have an issue.
+now when u enable the vitual nodes u will face any issue so resolution:-
+
+Now,   enable virtual nodes add on aks cluster
+now do kubectl get pods -n kube-ssytem and check aci-connector-linux it will be crashedoff.
+
+fix this using adding managed identifty role assinment 
+now do kubectl get nods u ave virtual node pool running.
+
+**create user node pools(linux)
+
+**create WIndows user node pool.(Netowrk policy should be Azure CNI)
+WIndows nood pools have a limit of 6 characters
+
+AKS cluster has max of 10 node pools with each node can have max of 100 nodes.
+
+***Now deploy apps to Node pools.
+to deploy apps on specific nodes use nodeselector in yaml files while doing deployments.
+*********************************
+*****************Using Terraform & Azure devops Proviusion AKS cluster**************************
+
+Install Azure Market place Plugins in Azure devops
+1)Terraform by meicrosoft devlabs
+2)Terraform buiild and release tasks
+
+here we using 2
+go to 2nd plugin from vs studio give detsils of below
+go to dev.azure.com -->org-->
+
+have ur git repo created
+with 3 folders kube manifest,pipeline backups,terraform
+
+cretae ne wproj in ur org
+crete service connection-->type ARM
+Azur AKS is integrated with AD group.
+default svc connection above doesn't have any permission to create AZ AD group.
+so go to SVC connection-->manage svc principal-->add permission-->azurec active firectory grap-->directory--read,write all
+u can generate ssh keys and upload it in pipeline librabry
+
+**steps
+
+create pipleine-->select reo-->starterpipeline
+build terraform validate stage(Publish artifatcs to azure pipleines)
+all these artifcats wil be checked out by agent and store in system default dir
+so publish articats to azure pipleines task
+install terraform
+do terraform init task
+do terraform validate task
+run pipeline
+then deployment of DEV AKS cluster
+deploy2 QA cluster
 
 
